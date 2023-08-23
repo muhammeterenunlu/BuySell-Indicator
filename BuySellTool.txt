@@ -1,23 +1,27 @@
 // © RahzTheAnalyst
 
 //@version=4
-study("Rahz BuySell", overlay=true)
+study("Rahz BuySell without Threshold", overlay=true)
 EMAlength=input(55,"BUYSELL_EMA")
 
 src = ohlc4
-haOpen = 0.0
-haOpen := (src + nz(haOpen[1])) / 2
-haC = (ohlc4 + nz(haOpen) + max(high, nz(haOpen)) + min(low, nz(haOpen))) / 4
+
+haOpen = security(syminfo.tickerid, "D", open)
+haC = security(syminfo.tickerid, "D", close)
+
 EMA1 = ema(haC, EMAlength)
 EMA2 = ema(EMA1, EMAlength)
 EMA3 = ema(EMA2, EMAlength)
 TMA1 = 3 * EMA1 - 3 * EMA2 + EMA3
+
 EMA4 = ema(TMA1, EMAlength)
 EMA5 = ema(EMA4, EMAlength)
 EMA6 = ema(EMA5, EMAlength)
 TMA2 = 3 * EMA4 - 3 * EMA5 + EMA6
 RAHZ = TMA1 - TMA2
+
 EREN = TMA1 + RAHZ
+
 EMA7 = ema(hlc3, EMAlength)
 EMA8 = ema(EMA7, EMAlength)
 EMA9 = ema(EMA8, EMAlength)
@@ -32,18 +36,20 @@ EREN1 = TMA3 + RAHZ1
 green = EREN1
 red = EREN
 
-longCond=green>red and green[1]<=red[1]
-shortCond=green<red and green[1]>=red[1]
+crossAbove = crossover(green, red)
+crossBelow = crossunder(green, red)
+
+longCond = crossAbove
+shortCond = crossBelow
 
 trendState = red < green ? true : red > green ? false : na
 openPlot = plot(green, title="Shadow", color=#CC0000, linewidth=10, style=plot.style_line, transp=90)
-closePlotU = plot(trendState ? red : na, transp=100, editable=false)
 openPlotU = plot(trendState ? green : na, transp=100, editable=false)
-closePlotD = plot(trendState ? na : red, transp=100, editable=false)
+closePlotU = plot(trendState ? red : na, transp=100, editable=false)
 openPlotD = plot(trendState ? na : green, transp=100, editable=false)
+closePlotD = plot(trendState ? na : red, transp=100, editable=false)
 fill(openPlotU, closePlotU, title="Upward Trend", color=#00FF00, transp=1)
 fill(openPlotD, closePlotD, title="Downward Trend", color=#FF0000, transp=1)
-
 
 last_signal = 0
 long_final = longCond and (nz(last_signal[1]) == 0 or nz(last_signal[1]) == -1)
@@ -55,7 +61,6 @@ last_signal := long_final ? 1 : short_final ? -1 : last_signal[1]
 
 plotshape(long_final, style=shape.triangleup, location=location.belowbar, color=color.green, size=size.normal,title="Buy")
 plotshape(short_final, style=shape.triangledown, location=location.abovebar, color=color.red, size=size.normal,title="Sell")
-
 
 out = ema(src, EMAlength)
 plot(out, title="EMA", color=color.blue)
