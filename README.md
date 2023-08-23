@@ -27,5 +27,4 @@ Main Components:
 5. Simple Exponential Moving Average (EMA):
    - A standard EMA is plotted in blue as a baseline trend indicator.
 
-Concise Summary:
 The "Rahz BuySell" indicator uses a Triple Exponential Moving Average (TEMA) on Heikin Ashi Close to determine market trends. The trend is highlighted in green for upward and red for downward. Buy and sell signals are generated based on the crossover of two trend lines, with visual markers (triangles) and alerts for traders. Additionally, a blue EMA line is plotted for reference.
